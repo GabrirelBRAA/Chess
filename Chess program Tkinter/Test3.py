@@ -1,0 +1,55 @@
+from Board import Board
+from Pawn import Pawn
+from Knight import Knight
+from Bishop import Bishop
+from Rook import Rook
+from Queen import Queen
+from King import King
+
+x=Board()
+x.initialize_board()
+y=Bishop(1,(1,"G"),"White",x)
+t=Bishop(2,(4,"D"),"White",x)
+u=Bishop(3,(6,"F"),"Black",x)
+f=Rook(1,(7,"D"),"White",x)
+o=Rook(1,(3,"G"),"Black",x)
+q=Queen(1,(5,"E"),"White",x)
+z=King(1,(6,"G"),"White",x)
+x.update_piece(f)
+x.update_piece(z)
+x.update_piece(o)
+x.update_piece(y)
+x.update_piece(t)
+x.update_piece(u)
+x.update_piece(q)
+x.print_board()
+y.find_moves()
+t.find_moves()
+u.find_moves()
+u.move((4,"D"))
+x.update_piece(u)
+x.print_board()
+x.check_king(z)
+f.find_moves()
+f.move((4,"D"))
+
+x.update_piece(f)
+x.print_board()
+o.move((3,"B"))
+x.update_piece(o)
+x.print_board()
+x.check_king(z)
+print(x.pieces)
+q.move((6,"F"))
+x.update_piece(q)
+x.print_board()
+q.move((1,"F"))
+x.update_piece(q)
+x.print_board()
+
+z.find_moves()
+print(x.pieces)
+o.move((6,"B"))
+x.update_piece(o)
+x.print_board()
+x.check_king(z)
