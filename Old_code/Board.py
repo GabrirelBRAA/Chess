@@ -6,8 +6,6 @@ from .Queen import Queen
 from .Rook import Rook
 from .King import King
 from .Piece import Piece
-from tkinter import *
-from tkinter import ttk
 ###Essa é a classe da mesa, que armazena a localização das peças e atualiza seus movimentos
 class Board():
     empty_space=Empty()
@@ -136,38 +134,7 @@ class Board():
 
       "\n   A  B  C  D  E  F  G  H")
 
-
-    def check_king(self,king):
-        king_position=king.position
-        king_color=king.color
-        opposing_pieces=[]
-        mensagem="O rei não está em check"
-        if king_color==0:
-            for x in self.pieces:
-                if x.color==1:
-                    opposing_pieces.append(x)
-
-            for x in opposing_pieces:
-                if king_position in x.find_moves():
-                    mensagem="Rei  está em check"
-                    break
-
-            print(mensagem)
-
-        elif king_color==1:
-            for x in self.pieces:
-                if x.color==0:
-                    opposing_pieces.append(x)
-
-
-            for x in opposing_pieces:
-                if king_position in x.find_moves():
-                    mensagem="Rei está em check"
-                    break
-
-            print(mensagem)
-
-    def check_tile(self,tile, color):
+    def check_tile(self, tile, color):
         opposing_pieces=[]
         can_reach=False
         possible=list()
@@ -177,10 +144,6 @@ class Board():
                     opposing_pieces.append(x)
 
             for x in opposing_pieces:
-               # if isinstance(x,King) and tile in x.find_moves(action=False):
-               #         can_reach += (x)
-               # elif tile in x.find_moves():
-               #     can_reach+=(x)
                     if isinstance(x,King):
                      possible+=x.find_moves(action=False)
 
