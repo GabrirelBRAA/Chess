@@ -1,6 +1,5 @@
 from .Piece import Piece
 from .Rook import Rook
-from .Empty_figure import Empty
 
 class King(Piece):
     def __init__(self,number,position,color,board):
@@ -9,100 +8,67 @@ class King(Piece):
         self.castle=False
 
     def find_moves(self, action=True):
-        movimentos=[]
-        posicao_possivel=[]
-        castle=list()
-        if self.color==1:
-            print("meme")
-            posicao_possivel.append((self.position[0] + 1,self.position[1]))
+        """Acha os movimentos do Rei
+           O parâmetro action diz que uma ação de um jogador está ocorrendo,
+           caso contrário é uma tentativa da lógica interna de achar movimentos para validar check ou o castle e a própria função castle é ignorada"""
+
+        movimentos=list()         #Movimentos que foram validados
+        posicao_possivel=list()   #Movimentos que não foram validados
+        castle=list()             #Movimentos de castelo
+
+        def movimentos_normais(color):
+            """Essa função acha e valida os movimentos normais do rei (Ela não checa se o rei está em check, isso é papel da Board)"""
+            ###Possivelmente precisará de alteração para invalidar movimentos para casas em check
+
+            posicao_possivel.append((self.position[0] + 1, self.position[1]    ))
             posicao_possivel.append((self.position[0] + 1, self.position[1] - 1))
-            posicao_possivel.append((self.position[0], self.position[1] - 1))
-            posicao_possivel.append((self.position[0] - 1, self.position[1] - 1))
-            posicao_possivel.append((self.position[0] - 1, self.position[1]))
-            posicao_possivel.append((self.position[0] - 1, self.position[1] + 1))
-            posicao_possivel.append((self.position[0], self.position[1] + 1))
             posicao_possivel.append((self.position[0] + 1, self.position[1] + 1))
+            posicao_possivel.append((self.position[0],     self.position[1] - 1))
+            posicao_possivel.append((self.position[0],     self.position[1] + 1))
+            posicao_possivel.append((self.position[0] - 1, self.position[1] - 1))
+            posicao_possivel.append((self.position[0] - 1, self.position[1]    ))
+            posicao_possivel.append((self.position[0] - 1, self.position[1] + 1))
 
             for x in posicao_possivel:
-                if x in self.board.initial_board and self.board.actual_board[x].color!=1:
+                if x in self.board.initial_board and self.board.actual_board[x].color!=color:
                     movimentos.append(x)
 
-            #Castle
-            if self.old==None and action:
-                print("mastermeme")
-                castle_left=list()
-                castle_right=list()
+        def check_castle(color):
+            """Checa se é posssível fazer o castle."""
 
-                can_castle_right=False
-                can_castle_left=False
+            castle_right = [(self.position[0], self.position[1]+n) for n in range(1,4)] ### Castle para esquerda, sendo o último item a posição da torre
+            castle_left = [(self.position[0], self.position[1]-n) for n in range(1,5)] ### Mesma coisa para direita
 
-                castle_right.append((self.position[0] ,self.position[1] + 1))
-                castle_right.append((self.position[0], self.position[1] + 2))
-                castle_right.append((self.position[0], self.position[1] + 3))
+            rook_right = self.board.actual_board[castle_right.pop()]
+            rook_left = self.board.actual_board[castle_left.pop()]
 
-                castle_left.append((self.position[0], self.position[1] - 1))
-                castle_left.append((self.position[0], self.position[1] - 2))
-                castle_left.append((self.position[0], self.position[1] - 3))
-                castle_left.append((self.position[0], self.position[1] - 4))
+            if (self.board.actual_board[castle_right[0]] and self.board.actual_board[castle_right[1]]) == self.board.empty_space \
+                and not (self.board.check_tile(castle_right[0], color) or self.board.check_tile(castle_right[1], color) or self.board.check_tile(self.position, color)) \
+                and rook_right.old==None:
 
-
-                if not self.board.check_tile(castle_right[0], 1) and not self.board.check_tile(castle_right[1], 1) and  isinstance(self.board.actual_board[castle_right[2]], Rook)\
-                        and self.board.actual_board[(1,6)]==self.board.empty_space and self.board.actual_board[(1,7)]==self.board.empty_space\
-                        and self.board.actual_board[(1,8)].old==None:
-                    can_castle_right=True
                     castle.append(castle_right[1])
 
-                if not self.board.check_tile(castle_left[0], 1) and not self.board.check_tile(castle_left[1], 1) and not self.board.check_tile(castle_right[2], 1)  and isinstance(self.board.actual_board[castle_left[3]], Rook)\
-                        and self.board.actual_board[(1,4)]==self.board.empty_space and self.board.actual_board[(1,3)]==self.board.empty_space\
-                        and self.board.actual_board[(1,2)]==self.board.empty_space and self.board.actual_board[(1,1)].old==None:
-                    can_castle_left=True
+            if (self.board.actual_board[castle_left[0]] and self.board.actual_board[castle_left[1]] and \
+                self.board.actual_board[castle_left[2]]) == self.board.empty_space \
+                    and not (self.board.check_tile(castle_left[0], color) or \
+                             self.board.check_tile(castle_left[1], color) or self.board.check_tile(self.position, color)) \
+                        and rook_left.old == None:
+
                     castle.append(castle_left[1])
 
+
+        if self.color==1:
+
+            movimentos_normais(1)
+            if self.old == None and action:
+                check_castle(1)
 
         elif self.color == 0:
-            posicao_possivel.append((self.position[0] + 1, self.position[1]))
-            posicao_possivel.append((self.position[0] + 1, self.position[1] - 1))
-            posicao_possivel.append((self.position[0], self.position[1] - 1))
-            posicao_possivel.append((self.position[0] - 1, self.position[1] - 1))
-            posicao_possivel.append((self.position[0] - 1, self.position[1]))
-            posicao_possivel.append((self.position[0] - 1, self.position[1] + 1))
-            posicao_possivel.append((self.position[0], self.position[1] + 1))
-            posicao_possivel.append((self.position[0] + 1, self.position[1] + 1))
 
-            for x in posicao_possivel:
-                if x in self.board.initial_board and self.board.actual_board[x].color != 0:
-                    movimentos.append(x)
+            movimentos_normais(0)
+            if self.old == None and action:
+                check_castle(0)
 
-            #Castle
-            if self.old==None and action:
-                castle_left=list()
-                castle_right=list()
-
-                can_castle_right=False
-                can_castle_left=False
-
-                castle_right.append(tuple([self.position[0] ,self.position[1] + 1]))
-                castle_right.append(tuple([self.position[0], self.position[1] + 2]))
-                castle_right.append(tuple([self.position[0], self.position[1] + 3]))
-
-                castle_left.append(tuple([self.position[0], self.position[1] - 1]))
-                castle_left.append(tuple([self.position[0], self.position[1] - 2]))
-                castle_left.append(tuple([self.position[0], self.position[1] - 3]))
-                castle_left.append(tuple([self.position[0], self.position[1] - 4]))
-                print("this is castle right")
-                print(castle_right)
-
-                if not self.board.check_tile(castle_right[0], 0) and not self.board.check_tile(castle_right[1], 0) and isinstance(self.board.actual_board[castle_right[2]], Rook)\
-                        and self.board.actual_board[(8,6)]==self.board.empty_space and self.board.actual_board[(8,7)]==self.board.empty_space\
-                        and self.board.actual_board[(8,8)].old==None:
-                    can_castle_right=True
-                    castle.append(castle_right[1])
-
-                if not self.board.check_tile(castle_left[0], 0) and not self.board.check_tile(castle_left[1], 0) and not self.board.check_tile(castle_right[2], 0)  and isinstance(self.board.actual_board[castle_left[3]], Rook)\
-                        and self.board.actual_board[(8,4)]==self.board.empty_space and self.board.actual_board[(8,3)]==self.board.empty_space\
-                        and self.board.actual_board[(8,2)]==self.board.empty_space and self.board.actual_board[(8,1)].old==None:
-                    can_castle_left=True
-                    castle.append(castle_left[1])
         if castle:
             return movimentos,castle
         else: return movimentos
