@@ -12,6 +12,6 @@ COMO RODAR?
 $python Tela.py
 
 Bugs-
-O en passant está bugado, não pretendo consertar pois estou migrando esse projeto para Javascript e HTML.
+O en passant está bugado, não pretendo consertar pois estou migrando esse projeto para Javascript e HTML (veja [Space Chess](https://github.com/GabrirelBRAA/SpaceChess)).
 
 
